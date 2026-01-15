@@ -1,0 +1,7 @@
+{
+  "name": "goodx-ssl-monitor",
+  "version": "1.0.0",
+  "dependencies": {
+    "ssl-checker": "^2.0.7"
+  }
+}
