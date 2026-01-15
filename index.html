@@ -138,6 +138,17 @@ td:contains('$')::after {
   position: absolute;
   left: 0;
 }
+
+    /* Hide pesky $ signs if they appear via pseudo-elements or artifacts */
+td::before,
+td::after,
+a::before,
+a::after,
+*[class*="status"]::before,
+*[class*="status"]::after {
+  content: none !important;
+  display: none !important;
+}
   </style>
 </head>
 <body>
