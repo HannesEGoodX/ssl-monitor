@@ -167,50 +167,44 @@ a::after,
 
   <div class="refresh-time">Last updated: <span id="last-updated">—</span> • Auto-refreshes every 60 min</div>
 
-  <script>
+<script>
   const API_URL = "/.netlify/functions/check-ssls";
 
   async function loadData() {
     try {
       const res = await fetch(API_URL);
-      if (!res.ok) {
-        throw new Error(`API error: ${res.status}`);
-      }
+      if (!res.ok) throw new Error("Failed to fetch data");
       const data = await res.json();
-      console.log('Fetched data:', data);  // Debug: Check in browser console
 
       const tbody = document.getElementById("tbody");
-      tbody.innerHTML = "";
+      tbody.innerHTML = "";  // clear old rows
 
       data.forEach(item => {
-        const daysLeft = item.daysLeft;
+        let daysLeft = item.daysLeft;
         let statusClass = "status-ok";
-        if (daysLeft === null || isNaN(daysLeft)) {
-          statusClass = "status-danger";
-        } else if (daysLeft < 0) {
-          statusClass = "status-danger";
-        } else if (daysLeft <= 30) {
-          statusClass = "status-warning";
-        }
+        if (daysLeft === "Expired" || daysLeft < 0 || daysLeft == null) statusClass = "status-danger";
+        else if (daysLeft <= 30) statusClass = "status-warning";
 
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td data-label="Website"><a href="https://$$   {item.host}" target="_blank">   $${item.host}</a></td>
-          <td data-label="Expiry">${item.validTo || "Error"}</td>
-          <td data-label="Days Left" class="$$   {statusClass}">   $${daysLeft === null ? "—" : daysLeft}</td>
+          <td data-label="Website"><a href="https://${item.host}" target="_blank">${item.host}</a></td>
+          <td data-label="Expiry Date">${item.validTo}</td>
+          <td data-label="Days Left" class="${statusClass}">${daysLeft === null ? "—" : daysLeft}</td>
         `;
         tbody.appendChild(row);
       });
 
       document.getElementById("last-updated").textContent = new Date().toLocaleString();
     } catch (err) {
-      console.error('Fetch error:', err);
-      document.getElementById("tbody").innerHTML = `<tr><td colspan="3" style="text-align:center;color:#c0392b;">Error loading data: ${err.message} – try refreshing</td></tr>`;
+      document.getElementById("tbody").innerHTML = `<tr><td colspan="3" style="text-align:center;color:red;">Error loading data – try again</td></tr>`;
     }
   }
 
+  // Load on page open
   loadData();
-  setInterval(loadData, 60 * 60 * 1000); // every hour
+
+  // Auto-refresh every hour
+  setInterval(loadData, 60 * 60 * 1000);
 </script>
 </body>
 </html>
