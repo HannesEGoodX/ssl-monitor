@@ -1,5 +1,4 @@
-// netlify/functions/check-ssls.js
-const https = require('https');
+const sslChecker = require('ssl-checker');
 
 const hosts = [
   "www.goodx.healthcare",
@@ -13,41 +12,41 @@ const hosts = [
   "goodxeye.com"
 ];
 
-async function getCertExpiry(host) {
-  return new Promise((resolve) => {
-    const req = https.request({ host, port: 443, method: 'HEAD' }, (res) => {
-      const cert = res.socket.getPeerCertificate();
-      if (!cert || !cert.valid_to) {
-        resolve({ host, validTo: "Error", daysLeft: null });
-        return;
-      }
-      const expiry = new Date(cert.valid_to);
+exports.handler = async (event, context) => {
+  console.log('Function invoked at', new Date().toISOString());
+
+  const results = [];
+
+  for (const host of hosts) {
+    try {
+      const data = await sslChecker(host, { port: 443, method: 'GET' }); // GET helps ensure full handshake
+      const expiry = new Date(data.valid_to);
       const now = new Date();
       const daysLeft = Math.floor((expiry - now) / (1000 * 60 * 60 * 24));
-      resolve({
+
+      results.push({
         host,
-        validTo: expiry.toISOString().split('T')[0], // YYYY-MM-DD
-        daysLeft
+        validTo: expiry.toISOString().split('T')[0],
+        daysLeft: daysLeft >= 0 ? daysLeft : 'Expired'
       });
-    });
 
-    req.on('error', () => resolve({ host, validTo: "Error", daysLeft: null }));
-    req.end();
-  });
-}
-
-exports.handler = async (event, context) => {
-  try {
-    const results = await Promise.all(hosts.map(getCertExpiry));
-    return {
-      statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(results)
-    };
-  } catch (err) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+      console.log(`Success for ${host}: ${data.valid_to}`);
+    } catch (err) {
+      console.error(`Error for ${host}:`, err.message);
+      results.push({
+        host,
+        validTo: "Error: " + (err.message || 'Unknown'),
+        daysLeft: null
+      });
+    }
   }
+
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600"
+    },
+    body: JSON.stringify(results)
+  };
 };
