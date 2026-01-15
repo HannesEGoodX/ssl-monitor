@@ -12,30 +12,36 @@ const hosts = [
   "goodxeye.com"
 ];
 
-exports.handler = async (event, context) => {
-  console.log('Function invoked at', new Date().toISOString());
-
+exports.handler = async () => {
   const results = [];
 
   for (const host of hosts) {
     try {
-      const data = await sslChecker(host, { port: 443, method: 'GET' }); // GET helps ensure full handshake
-      const expiry = new Date(data.valid_to);
-      const now = new Date();
-      const daysLeft = Math.floor((expiry - now) / (1000 * 60 * 60 * 24));
+      const data = await sslChecker(host, { method: 'GET' });  // Force GET for full handshake
+      console.log(`Raw data for ${host}:`, data);  // Logs to Netlify function logs
+
+      let expiryDate;
+      if (data.valid_to && typeof data.valid_to === 'string') {
+        expiryDate = new Date(data.valid_to);
+      } else {
+        expiryDate = new Date(data.validTo || data.expires || '');  // fallback fields
+      }
+
+      let daysLeft = null;
+      if (!isNaN(expiryDate.getTime())) {
+        daysLeft = Math.floor((expiryDate - Date.now()) / (1000 * 60 * 60 * 24));
+      }
 
       results.push({
         host,
-        validTo: expiry.toISOString().split('T')[0],
-        daysLeft: daysLeft >= 0 ? daysLeft : 'Expired'
+        validTo: expiryDate.toISOString ? expiryDate.toISOString().split('T')[0] : "Invalid date",
+        daysLeft: daysLeft !== null ? (daysLeft >= 0 ? daysLeft : 'Expired') : null
       });
-
-      console.log(`Success for ${host}: ${data.valid_to}`);
     } catch (err) {
       console.error(`Error for ${host}:`, err.message);
       results.push({
         host,
-        validTo: "Error: " + (err.message || 'Unknown'),
+        validTo: `Error: ${err.message || 'Unknown'}`,
         daysLeft: null
       });
     }
@@ -43,10 +49,7 @@ exports.handler = async (event, context) => {
 
   return {
     statusCode: 200,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=3600"
-    },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(results)
   };
 };
