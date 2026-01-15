@@ -6,59 +6,98 @@
   <title>GoodX SSL Expiry Dashboard</title>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f0f4f8;
-      color: #333;
-      margin: 0;
-      padding: 20px;
-      line-height: 1.5;
-    }
-    h1 {
-      text-align: center;
-      color: #2c3e50;
-      margin-bottom: 30px;
-    }
-    table {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 16px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
-    }
-    th {
-      background: #34495e;
-      color: white;
-    }
-    tr:last-child td { border-bottom: none; }
-    .status-ok { color: #27ae60; font-weight: bold; }
-    .status-warning { color: #e67e22; font-weight: bold; }
-    .status-danger { color: #c0392b; font-weight: bold; }
-    .refresh-time {
-      text-align: center;
-      margin-top: 20px;
-      color: #7f8c8d;
-      font-size: 0.9em;
-    }
-    @media (max-width: 600px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      th { display: none; }
-      td { position: relative; padding-left: 50%; }
-      td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        width: 45%;
-        font-weight: bold;
-      }
-    }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8f9fa;
+  color: #333;
+  margin: 0;
+  padding: 40px 20px;
+  line-height: 1.6;
+}
+
+h1 {
+  text-align: center;
+  color: #003366;          /* Dark blue like GoodX */
+  margin-bottom: 30px;
+  font-size: 2.2em;
+  font-weight: 600;
+}
+
+.refresh-btn {
+  display: block;
+  margin: 0 auto 30px;
+  padding: 12px 30px;
+  background: #0066cc;     /* GoodX-style blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1em;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: background 0.2s;
+}
+
+.refresh-btn:hover {
+  background: #0055aa;
+}
+
+table {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 16px 20px;
+  text-align: left;
+}
+
+th {
+  background: #0066cc;     /* Blue header like GoodX */
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.95em;
+  letter-spacing: 0.5px;
+}
+
+td {
+  border-bottom: 1px solid #eee;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+a {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.status-ok    { color: #28a745; font-weight: bold; }
+.status-warning { color: #fd7e14; font-weight: bold; }
+.status-danger  { color: #dc3545; font-weight: bold; }
+
+.refresh-time {
+  text-align: center;
+  margin-top: 30px;
+  color: #6c757d;
+  font-size: 0.95em;
+}
+
+@media (max-width: 768px) {
+  th, td { padding: 12px 15px; }
+  h1 { font-size: 1.8em; }
+}
   </style>
 </head>
 <body>
