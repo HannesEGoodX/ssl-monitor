@@ -1,7 +1,4 @@
-headers: { 
-  'Content-Type': 'application/json',
-  'Cache-Control': 'public, max-age=3600'  // cache 1 hour
-}
+
 
 const sslChecker = require('ssl-checker');
 
