@@ -179,19 +179,20 @@ a::after,
       const tbody = document.getElementById("tbody");
       tbody.innerHTML = "";  // clear old rows
 
-      data.forEach(item => {
-        let daysLeft = item.daysLeft;
-        let statusClass = "status-ok";
-        if (daysLeft === "Expired" || daysLeft < 0 || daysLeft == null) statusClass = "status-danger";
-        else if (daysLeft <= 30) statusClass = "status-warning";
+     data.forEach(item => {
+  const daysLeft = item.daysLeft;
+  let statusClass = "status-ok";
+  if (daysLeft < 0 || daysLeft === null) statusClass = "status-danger";
+  else if (daysLeft <= 30) statusClass = "status-warning";
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td data-label="Website"><a href="https://${item.host}" target="_blank">${item.host}</a></td>
-          <td data-label="Expiry Date">${item.validTo}</td>
-          <td data-label="Days Left" class="${statusClass}">${daysLeft === null ? "—" : daysLeft}</td>
-        `;
-        tbody.appendChild(row);
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td data-label="Website"><a href="https://${item.host}" target="_blank">${item.host}</a></td>
+    <td data-label="Expiry Date">${item.validTo || "Error"}</td>
+    <td data-label="Days Left" class="${statusClass}">${daysLeft === null ? "—" : daysLeft}</td>
+  `;
+  tbody.appendChild(row);
+});
       });
 
       document.getElementById("last-updated").textContent = new Date().toLocaleString();
