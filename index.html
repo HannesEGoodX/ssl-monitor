@@ -98,6 +98,46 @@ a:hover {
   th, td { padding: 12px 15px; }
   h1 { font-size: 1.8em; }
 }
+
+    /* Hide any unexpected dollar signs that might appear as artifacts */
+td::before,
+td > span,
+td[data-label]::before,
+a::before,
+.status-ok::before,
+.status-warning::before,
+.status-danger::before {
+  content: none !important;  /* overrides any pseudo-element content */
+}
+
+td,
+a,
+.status-ok,
+.status-warning,
+.status-danger {
+  display: contents;  /* helps if $ is somehow wrapped */
+}
+
+/* More aggressive global hide for $ text nodes (rare but covers edge cases) */
+* {
+  &::before,
+  &::after {
+    content: "" !important;
+  }
+}
+
+/* If $ is literally in text, hide via visibility (last resort) */
+td:contains('$'),
+a:contains('$') {
+  visibility: hidden;
+  position: relative;
+}
+td:contains('$')::after {
+  content: attr(data-original-text);  /* optional: show clean text if needed */
+  visibility: visible;
+  position: absolute;
+  left: 0;
+}
   </style>
 </head>
 <body>
